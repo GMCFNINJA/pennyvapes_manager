@@ -2,13 +2,15 @@
 const $ = (id) => document.getElementById(id);
 
 async function routeAfterLogin() {
-  const { data } = await supabase.auth.getUser();
-  const user = data?.user;
-  if (!user) return;
+  const { data } = await sb.auth.getUser();
+  if (!data?.user) return;
 
-  const role = user.app_metadata?.role;
-  if (role === "admin") window.location.href = "admin.html";
-  else window.location.href = "app.html";
+  const role = data.user.app_metadata?.role;
+  if (role === "admin") {
+    window.location.href = "admin.html";
+  } else {
+    window.location.href = "app.html";
+  }
 }
 
 $("btnLogin").addEventListener("click", async () => {
@@ -18,12 +20,16 @@ $("btnLogin").addEventListener("click", async () => {
   const password = $("password").value;
 
   if (!username || !password) {
-    $("msg").textContent = "Preenche username e password.";
+    $("msg").textContent = "Preenche tudo.";
     return;
   }
 
   const email = usernameToEmail(username);
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+  const { error } = await sb.auth.signInWithPassword({
+    email,
+    password,
+  });
 
   if (error) {
     $("msg").textContent = "Login inválido.";
@@ -33,5 +39,5 @@ $("btnLogin").addEventListener("click", async () => {
   await routeAfterLogin();
 });
 
+// se já tiver sessão
 routeAfterLogin();
-
