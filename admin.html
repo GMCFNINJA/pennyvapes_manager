@@ -4,11 +4,19 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin</title>
-  <link rel="stylesheet" href="style.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="supabase.js"></script>
   <script defer src="admin.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; background:#f5f5f5; }
+    .topbar { background:#fff; border-bottom:1px solid #ddd; padding:12px 16px; display:flex; gap:10px; align-items:center; }
+    .spacer { flex:1; }
+    button { padding:10px 12px; border:1px solid #333; border-radius:10px; background:#fff; cursor:pointer; }
+    .container { padding:16px; }
+    .msg { color:#b00020; }
+  </style>
 </head>
 <body>
   <header class="topbar">
@@ -20,7 +28,6 @@
 
   <main class="container">
     <p id="msg" class="msg"></p>
-    <pre id="debug" style="white-space:pre-wrap;"></pre>
   </main>
 </body>
 </html>
