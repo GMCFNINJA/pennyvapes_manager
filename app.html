@@ -10,147 +10,159 @@
   <script defer src="inventory.js"></script>
 
   <style>
-    * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
-
-    body{
-      margin:0;
-      min-height:100vh;
-      background:#3a3a3a;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      color:#fff;
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
-    .app{
-      width:100%;
-      max-width:380px;
-      min-height:92vh;
-      padding:12px 18px 20px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: #3a3a3a; /* igual ao login */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
     }
 
-    header.topbar{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding:10px 0;
+    /* ecrã “em pé” e centrado */
+    .app {
+      width: 100%;
+      max-width: 380px;
+      min-height: 92vh;
+      padding: 12px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
 
-    header.topbar strong{ font-size:22px; }
-    .spacer{ flex:1; }
-
-    #btnLogout{
-      padding:10px 14px;
-      border-radius:12px;
-      border:none;
-      background:#fff;
-      color:#000;
-      cursor:pointer;
-      font-size:14px;
-      font-weight:600;
-    }
-    #btnLogout:active{ transform:scale(0.98); }
-
-    main.container{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+    header.topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
     }
 
-    #msg.msg{
-      margin:0;
-      min-height:20px;
-      font-size:14px;
-      color:#ffb3b3;
+    header.topbar strong {
+      font-size: 22px;
+      letter-spacing: 0.2px;
     }
 
-    /* LISTA */
-    #list.list{
-      display:flex;
-      flex-direction:column;
-      gap:14px;
+    .spacer { flex: 1; }
+
+    #btnLogout {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: none;
+      background: white;
+      color: black;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
     }
 
-    /* 🔥 O PRINCIPAL: qualquer item que o JS meter aqui vira “card horizontal” */
-    #list.list > *{
-      background:#3f3f3f;
-      border-radius:14px;
-      padding:14px;
-      display:flex;
-      align-items:center;
-      gap:14px;
+    #btnLogout:active { transform: scale(0.98); }
+
+    main.container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    /* Título/label do item (Item 1 / Item 2 / etc.) */
-    #list.list > * :is(h1,h2,h3,h4,strong,b,p,span){
-      margin:0;
+    #msg.msg {
+      margin: 0;
+      min-height: 20px;
+      font-size: 14px;
+      color: #ffb3b3;
     }
 
-    /* Se existir um título, deixa ele “ser” a parte da esquerda */
-    #list.list > * :is(h1,h2,h3,h4,strong){
-      font-size:26px;
-      font-weight:700;
-      flex:1;              /* ocupa espaço à esquerda */
-      order:1;
+    #list.list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
 
-    /* Se o JS usar <p> ou <span> para o nome */
-    #list.list > * :is(p, span){
-      font-size:26px;
-      font-weight:700;
-      flex:1;
-      order:1;
+    /* ===== CARDS ===== */
+    .row {
+      background-color: #3f3f3f;
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
 
-    /* Imagem (se o JS meter <img>) */
-    #list.list > * img{
-      width:70px;
-      height:70px;
-      object-fit:contain;
-      order:2;
+    /* imagem placeholder (PNG, sem bordas e sem fundo) */
+    .row::before {
+      content: "";
+      width: 70px;
+      height: 70px;
+
+      background-image: url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/1.png");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+
+      /* sem borda, sem background */
+      flex: 0 0 auto;
+      order: 2;
     }
 
-    /* Botões */
-    #list.list > * button{
-      width:38px;
-      height:38px;
-      border-radius:10px;
-      border:none;
-      background:#fff;
-      color:#000;
-      cursor:pointer;
-      font-size:22px;
-      font-weight:700;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-    }
-    #list.list > * button:active{ transform:scale(0.95); }
-
-    /* Quantidade (normalmente é um <span> ou texto solto) */
-    /* Isto pega em spans curtos (tipo "1", "4", "10") e trata como qty */
-    #list.list > * span{
-      min-width:28px;
-      text-align:center;
-      font-size:28px;
-      font-weight:800;
-      order:4;
+    .left {
+      flex: 1;
+      min-width: 0;
+      order: 1;
     }
 
-    /* Se houver dois botões, força o "-" antes e o "+" depois */
-    #list.list > * button:nth-of-type(1){ order:3; } /* primeiro botão */
-    #list.list > * button:nth-of-type(2){ order:5; } /* segundo botão */
-
-    /* Empurra controles para a direita */
-    #list.list > * :is(button, span):not(:first-child){
-      margin-left:0;
+    /* "Item 1" etc. */
+    .name {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    #list.list > * button:nth-of-type(1){
-      margin-left:auto; /* joga a área de controles para a direita */
+
+    .right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      order: 3;
+    }
+
+    .btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: none;
+      background: white;
+      color: black;
+      cursor: pointer;
+      font-size: 22px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:active { transform: scale(0.95); }
+
+    .qty {
+      min-width: 26px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    /* Ajuste para ecrãs mais baixos */
+    @media (max-height: 700px) {
+      .row::before { width: 62px; height: 62px; }
+      .name { font-size: 24px; }
+      .qty { font-size: 26px; }
+      .btn { width: 36px; height: 36px; }
     }
   </style>
 </head>
