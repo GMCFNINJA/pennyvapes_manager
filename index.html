@@ -33,18 +33,20 @@
       text-align: center;
     }
 
-    /* Placeholder da logo */
+    /* Área da logo */
     .logo {
       width: 100%;
       height: 160px;
-      background-color: #dcdcdc;
-      border-radius: 4px;
-      margin-bottom: 80px; /* ↑↑ MUITO mais espaço */
+      margin-bottom: 80px;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: #666;
-      font-size: 18px;
+    }
+
+    .logo img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
     }
 
     label {
@@ -90,7 +92,9 @@
 <body>
   <div class="app">
     <div class="logo">
-      LOGO
+      <img 
+        src="https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/d1fd929f-b491-4403-9d7c-d548c4ce93ba.png"
+        alt="Logo Penny Vapes">
     </div>
 
     <label for="username">Utilizador</label>
