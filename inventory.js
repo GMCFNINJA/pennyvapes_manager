@@ -1,6 +1,8 @@
 // inventory.js
 const $ = (id) => document.getElementById(id);
 
+console.log("inventory.js carregou ✅");
+
 async function requireUser() {
   const { data } = await sb.auth.getUser();
   const user = data?.user;
@@ -9,23 +11,11 @@ async function requireUser() {
     window.location.href = "index.html";
     return null;
   }
-
   if (user.app_metadata?.role === "admin") {
     window.location.href = "admin.html";
     return null;
   }
-
   return user;
-}
-
-function itemImgSvg(n) {
-  const hue = (n * 35) % 360;
-  return `
-    <svg width="36" height="36" viewBox="0 0 64 64" aria-hidden="true">
-      <circle cx="28" cy="24" r="16" fill="hsl(${hue},70%,55%)"></circle>
-      <rect x="26" y="36" width="4" height="22" rx="2" fill="#888"></rect>
-    </svg>
-  `;
 }
 
 async function loadInventory(userId) {
@@ -46,49 +36,29 @@ function render(items) {
   for (const it of items) {
     const row = document.createElement("div");
     row.className = "row";
-
     row.innerHTML = `
       <div class="left">
-        <div class="img">${itemImgSvg(it.item_no)}</div>
-        <div class="name">${it.item_no}</div>
+        <div class="name">Item ${it.item_no}</div>
       </div>
 
       <div class="right">
-        <button class="btn" data-op="minus" data-item="${it.item_no}" type="button">−</button>
+        <button class="btn" type="button" data-op="minus" data-item="${it.item_no}">−</button>
         <div class="qty" id="qty-${it.item_no}">${it.qty}</div>
-        <button class="btn" data-op="plus" data-item="${it.item_no}" type="button">+</button>
+        <button class="btn" type="button" data-op="plus" data-item="${it.item_no}">+</button>
       </div>
     `;
-
     list.appendChild(row);
   }
 }
 
-async function setQty(userId, itemNo, next) {
+async function saveQty(userId, itemNo, qty) {
   const { error } = await sb
     .from("inventory_items")
-    .update({ qty: next, updated_at: new Date().toISOString() })
+    .update({ qty, updated_at: new Date().toISOString() })
     .eq("user_id", userId)
     .eq("item_no", itemNo);
 
   if (error) throw error;
-}
-
-async function changeQty(userId, itemNo, delta) {
-  const qtyEl = document.getElementById(`qty-${itemNo}`);
-  const current = parseInt(qtyEl.textContent, 10);
-  const next = Math.max(0, current + delta);
-
-  // UI imediata (rápida)
-  qtyEl.textContent = String(next);
-
-  try {
-    await setQty(userId, itemNo, next);
-  } catch (e) {
-    // rollback se falhar
-    qtyEl.textContent = String(current);
-    throw e;
-  }
 }
 
 $("btnLogout").addEventListener("click", async () => {
@@ -104,25 +74,31 @@ $("btnLogout").addEventListener("click", async () => {
     const items = await loadInventory(user.id);
     render(items);
   } catch (e) {
+    console.error(e);
     $("msg").textContent = "Erro ao carregar inventário.";
     return;
   }
 
-  // Delegation: 1 listener para todos os botões
   $("list").addEventListener("click", async (ev) => {
     const btn = ev.target.closest("button[data-op]");
     if (!btn) return;
 
-    $("msg").textContent = "";
-
     const itemNo = parseInt(btn.dataset.item, 10);
     const op = btn.dataset.op;
-    const delta = op === "plus" ? 1 : -1;
+
+    const qtyEl = document.getElementById(`qty-${itemNo}`);
+    const current = parseInt(qtyEl.textContent, 10);
+    const next = Math.max(0, current + (op === "plus" ? 1 : -1));
+
+    // UI instantânea
+    qtyEl.textContent = String(next);
 
     try {
-      await changeQty(user.id, itemNo, delta);
+      await saveQty(user.id, itemNo, next);
     } catch (e) {
-      $("msg").textContent = "Erro ao atualizar (RLS ou rede).";
+      console.error(e);
+      qtyEl.textContent = String(current);
+      $("msg").textContent = "Erro ao atualizar.";
       setTimeout(() => ($("msg").textContent = ""), 1500);
     }
   });
