@@ -2,13 +2,19 @@
 <html lang="pt">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Login</title>
-  <link rel="stylesheet" href="style.css" />
 
-  <!-- SDK -->
+  <style>
+    body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; }
+    .card { max-width: 360px; margin: 40px auto; background:#fff; padding:16px; border:1px solid #ddd; border-radius:12px; display:flex; flex-direction:column; gap:10px; }
+    label { font-size: 14px; }
+    input { padding:10px; border:2px solid #333; border-radius:10px; font-size:16px; }
+    button { padding:10px; border:1px solid #333; border-radius:10px; background:#fff; cursor:pointer; }
+    .msg { color:#b00020; min-height:18px; }
+  </style>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- teu código -->
   <script defer src="supabase.js"></script>
   <script defer src="auth.js"></script>
 </head>
@@ -16,5 +22,14 @@
   <main class="card">
     <h1>Login</h1>
 
-    <input id="username" placeholder="Username" />
-    <inpu
+    <label for="username">Nome de utilizador</label>
+    <input id="username" placeholder="admin" autocomplete="username" />
+
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+    <button id="btnLogin">Entrar</button>
+    <p id="msg" class="msg"></p>
+  </main>
+</body>
+</html>
