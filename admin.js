@@ -8,25 +8,33 @@ async function requireAdmin() {
   }
   if (data.user.app_metadata?.role !== "admin") {
     window.location.href = "app.html";
+    return;
   }
 }
 
 async function callFn(name, body) {
-  const { data } = await sb.auth.getSession();
+  const { data, error } = await sb.auth.getSession();
   const token = data?.session?.access_token;
 
-  const res = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+  if (error || !token) {
+    throw new Error("Sem sessão/token. Faz logout e login de novo.");
+  }
+
+  const res = await fetch(`${window.SUPABASE_URL}/functions/v1/${name}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      // ✅ importante: mandar apikey (anon) + JWT do user
+      "apikey": window.SUPABASE_ANON_KEY,
+      "Authorization": `Bearer ${token}`,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body ?? {}),
   });
 
   const text = await res.text();
-  if (!res.ok) throw new Error(text);
-  return JSON.parse(text);
+  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+
+  try { return JSON.parse(text); } catch { return text; }
 }
 
 $("btnCreate").onclick = async () => {
@@ -37,10 +45,10 @@ $("btnCreate").onclick = async () => {
   if (!username || !password) return;
 
   try {
-    await callFn("admin-create-user", { username, password });
-    $("msg").textContent = "Conta criada com sucesso";
+    const out = await callFn("admin-create-user", { username, password });
+    $("msg").textContent = "Conta criada: " + (out.username ?? username);
   } catch (e) {
-    $("msg").textContent = "Erro: " + e.message;
+    $("msg").textContent = "Erro: " + (e?.message ?? e);
   }
 };
 
