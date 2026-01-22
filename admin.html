@@ -2,6 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin</title>
   <link rel="stylesheet" href="style.css" />
 
@@ -12,13 +13,14 @@
 <body>
   <header class="topbar">
     <strong>Admin</strong>
-    <button id="btnCreate">Criar conta</button>
-    <button id="btnLogout">Sair</button>
+    <div class="spacer"></div>
+    <button id="btnCreate" type="button">Criar conta</button>
+    <button id="btnLogout" type="button">Sair</button>
   </header>
 
   <main class="container">
-    <div id="users"></div>
     <p id="msg" class="msg"></p>
+    <pre id="debug" style="white-space:pre-wrap;"></pre>
   </main>
 </body>
 </html>
