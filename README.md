@@ -9,5 +9,7 @@
   É uma aplicação privada, apenas para utilizadores autorizados<br>
   <em>(contactar para pedir acesso:
   <a href="https://instagram.com/s.tomass9" target="_blank"><strong>s.tomass9</strong></a>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="14" />)</em>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"
+       width="14"
+       align="absmiddle" />)</em>
 </p>
