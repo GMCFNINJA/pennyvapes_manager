@@ -10,159 +10,212 @@
   <script defer src="inventory.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, Helvetica, sans-serif;
+    * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      background:#3a3a3a;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      color:#fff;
     }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background-color: #3a3a3a; /* igual ao login */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
+    .app{
+      width:100%;
+      max-width:380px;
+      min-height:92vh;
+      padding:12px 18px 20px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
     }
 
-    /* ecrã “em pé” e centrado */
-    .app {
-      width: 100%;
-      max-width: 380px;
-      min-height: 92vh;
-      padding: 12px 18px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+    header.topbar{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 0;
     }
 
-    header.topbar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 0;
+    header.topbar strong{ font-size:22px; }
+    .spacer{ flex:1; }
+
+    #btnLogout{
+      padding:10px 14px;
+      border-radius:12px;
+      border:none;
+      background:#fff;
+      color:#000;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:600;
+    }
+    #btnLogout:active{ transform:scale(0.98); }
+
+    main.container{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
     }
 
-    header.topbar strong {
-      font-size: 22px;
-      letter-spacing: 0.2px;
+    #msg.msg{
+      margin:0;
+      min-height:20px;
+      font-size:14px;
+      color:#ffb3b3;
     }
 
-    .spacer { flex: 1; }
-
-    #btnLogout {
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: none;
-      background: white;
-      color: black;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
+    #list.list{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
     }
 
-    #btnLogout:active { transform: scale(0.98); }
-
-    main.container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    /* ===== CARD ===== */
+    .row{
+      background:#3f3f3f;
+      border-radius:14px;
+      padding:14px;
+      display:flex;
+      align-items:center;
+      gap:10px; /* ↓ mais perto */
     }
 
-    #msg.msg {
-      margin: 0;
-      min-height: 20px;
-      font-size: 14px;
-      color: #ffb3b3;
-    }
-
-    #list.list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    /* ===== CARDS ===== */
-    .row {
-      background-color: #3f3f3f;
-      border-radius: 14px;
-      padding: 14px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    /* imagem placeholder (PNG, sem bordas e sem fundo) */
-    .row::before {
-      content: "";
-      width: 70px;
-      height: 70px;
-
-      background-image: url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/1.png");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-
-      /* sem borda, sem background */
+    /* esquerda (número) não estica */
+    .left{
       flex: 0 0 auto;
-      order: 2;
-    }
-
-    .left {
-      flex: 1;
-      min-width: 0;
       order: 1;
     }
 
-    /* "Item 1" etc. */
-    .name {
-      font-size: 26px;
-      font-weight: 700;
-      line-height: 1.1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    /* “Item X” -> mostra só o número (sem mexer no JS) */
+    .name{
+      font-size:0;            /* esconde o texto original */
+      line-height:1;
     }
 
-    .right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      order: 3;
+    .name::after{
+      content:"";             /* vamos preencher por nth-child */
+      font-size:44px;
+      font-weight:800;
+      display:inline-block;
+      min-width: 22px;
     }
 
-    .btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      border: none;
-      background: white;
-      color: black;
-      cursor: pointer;
-      font-size: 22px;
-      font-weight: 800;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+    /* Imagem PNG sem borda/fundo, colada ao número */
+    .row::before{
+      content:"";
+      width:70px;
+      height:70px;
+      background-repeat:no-repeat;
+      background-position:center;
+      background-size:contain;
+      flex:0 0 auto;
+      order:2;
     }
 
-    .btn:active { transform: scale(0.95); }
-
-    .qty {
-      min-width: 26px;
-      text-align: center;
-      font-size: 28px;
-      font-weight: 800;
-      line-height: 1;
+    /* controles na direita */
+    .right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-left:auto; /* empurra pra direita */
+      order:3;
     }
 
-    /* Ajuste para ecrãs mais baixos */
-    @media (max-height: 700px) {
-      .row::before { width: 62px; height: 62px; }
-      .name { font-size: 24px; }
-      .qty { font-size: 26px; }
-      .btn { width: 36px; height: 36px; }
+    .btn{
+      width:38px;
+      height:38px;
+      border-radius:10px;
+      border:none;
+      background:#fff;
+      color:#000;
+      cursor:pointer;
+      font-size:22px;
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .btn:active{ transform:scale(0.95); }
+
+    .qty{
+      min-width:26px;
+      text-align:center;
+      font-size:28px;
+      font-weight:800;
+      line-height:1;
+    }
+
+    /* ====== MAPA 1..10 (número + imagem) ====== */
+    /* 1 */
+    #list > .row:nth-child(1)::before{
+      background-image:url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/1.png");
+    }
+    #list > .row:nth-child(1) .name::after{ content:"1"; }
+
+    /* 2 */
+    #list > .row:nth-child(2)::before{
+      background-image:url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/2.png");
+    }
+    #list > .row:nth-child(2) .name::after{ content:"2"; }
+
+    /* 3 */
+    #list > .row:nth-child(3)::before{
+      background-image:url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/3.png");
+    }
+    #list > .row:nth-child(3) .name::after{ content:"3"; }
+
+    /* 4 */
+    #list > .row:nth-child(4)::before{
+      background-image:url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/4.png");
+    }
+    #list > .row:nth-child(4) .name::after{ content:"4"; }
+
+    /* 5 */
+    #list > .row:nth-child(5)::before{
+      background-image:url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/5.png");
+    }
+    #list > .row:nth-child(5) .name::after{ content:"5"; }
+
+    /* 6 */
+    #list > .row:nth-child(6)::before{
+      background-image:url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/6.png");
+    }
+    #list > .row:nth-child(6) .name::after{ content:"6"; }
+
+    /* 7 */
+    #list > .row:nth-child(7)::before{
+      background-image:url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/7.png");
+    }
+    #list > .row:nth-child(7) .name::after{ content:"7"; }
+
+    /* 8 */
+    #list > .row:nth-child(8)::before{
+      background-image:url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/8.png");
+    }
+    #list > .row:nth-child(8) .name::after{ content:"8"; }
+
+    /* 9 */
+    #list > .row:nth-child(9)::before{
+      background-image:url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/9.png");
+    }
+    #list > .row:nth-child(9) .name::after{ content:"9"; }
+
+    /* 10 */
+    #list > .row:nth-child(10)::before{
+      background-image:url("https://raw.githubusercontent.com/GMCFNINJA/pennyvapes_manager/refs/heads/main/1-10/10.png");
+    }
+    #list > .row:nth-child(10) .name::after{ content:"10"; }
+
+    /* ecrãs baixos */
+    @media (max-height: 700px){
+      .row::before{ width:62px; height:62px; }
+      .name::after{ font-size:38px; }
+      .qty{ font-size:26px; }
+      .btn{ width:36px; height:36px; }
     }
   </style>
 </head>
