@@ -1,87 +1,33 @@
-// admin.js
-const $ = (id) => document.getElementById(id);
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin</title>
 
-function logDebug(...args) {
-  console.log(...args);
-  const d = $("debug");
-  if (d) d.textContent += args.map(a => (typeof a === "string" ? a : JSON.stringify(a))).join(" ") + "\n";
-}
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="supabase.js"></script>
+  <script defer src="admin.js"></script>
 
-async function requireAdmin() {
-  const { data } = await sb.auth.getUser();
-  const user = data?.user;
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; background:#f5f5f5; }
+    .topbar { background:#fff; border-bottom:1px solid #ddd; padding:12px 16px; display:flex; gap:10px; align-items:center; }
+    .spacer { flex:1; }
+    button { padding:10px 12px; border:1px solid #333; border-radius:10px; background:#fff; cursor:pointer; }
+    .container { padding:16px; }
+    .msg { color:#b00020; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <strong>Admin</strong>
+    <div class="spacer"></div>
+    <button id="btnCreate" type="button">Criar conta</button>
+    <button id="btnLogout" type="button">Sair</button>
+  </header>
 
-  if (!user) {
-    logDebug("Sem user -> ir para index.html");
-    window.location.href = "index.html";
-    return null;
-  }
-
-  logDebug("Logado como:", user.email);
-  logDebug("Role:", user.app_metadata?.role);
-
-  if (user.app_metadata?.role !== "admin") {
-    logDebug("Não é admin -> ir para app.html");
-    window.location.href = "app.html";
-    return null;
-  }
-
-  return user;
-}
-
-async function callFn(name, body) {
-  const { data, error } = await sb.auth.getSession();
-  const token = data?.session?.access_token;
-
-  logDebug("SUPABASE_URL:", window.SUPABASE_URL);
-  logDebug("Token starts:", token ? token.slice(0, 20) : "SEM TOKEN");
-
-  if (error || !token) throw new Error("Sem sessão/token. Faz login de novo.");
-
-  const res = await fetch(`${window.SUPABASE_URL}/functions/v1/${name}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(body ?? {}),
-  });
-
-  const text = await res.text();
-  logDebug("Function status:", res.status);
-  logDebug("Function response:", text);
-
-  if (!res.ok) throw new Error(text);
-
-  try { return JSON.parse(text); } catch { return text; }
-}
-
-window.addEventListener("DOMContentLoaded", async () => {
-  $("msg").textContent = "";
-  $("debug").textContent = "";
-
-  await requireAdmin();
-
-  $("btnLogout").addEventListener("click", async () => {
-    await sb.auth.signOut();
-    window.location.href = "index.html";
-  });
-
-  $("btnCreate").addEventListener("click", async () => {
-    $("msg").textContent = "";
-    logDebug("Cliquei em Criar conta");
-
-    const username = prompt("Novo username (ex: tomas):");
-    if (!username) return;
-
-    const password = prompt("Password:");
-    if (!password) return;
-
-    try {
-      const out = await callFn("admin-create-user", { username: username.trim(), password });
-      $("msg").textContent = `Conta criada: ${out.username}`;
-    } catch (e) {
-      $("msg").textContent = "Erro: " + (e?.message ?? e);
-    }
-  });
-});
+  <main class="container">
+    <p id="msg" class="msg"></p>
+  </main>
+</body>
+</html>
