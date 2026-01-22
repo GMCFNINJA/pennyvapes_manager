@@ -25,7 +25,7 @@
       color: white;
     }
 
-    /* “Ecrã” estilo telemóvel */
+    /* Ecrã mobile (igual ao login) */
     .app {
       width: 100%;
       max-width: 380px;
@@ -36,17 +36,15 @@
       gap: 14px;
     }
 
-    /* Top bar igual vibe do login */
-    .topbar {
+    header.topbar {
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 10px 0;
     }
 
-    .topbar strong {
+    header.topbar strong {
       font-size: 22px;
-      letter-spacing: 0.2px;
     }
 
     .spacer {
@@ -68,60 +66,87 @@
       transform: scale(0.98);
     }
 
-    /* Conteúdo */
-    .container {
+    main.container {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
-    /* Mensagens */
-    .msg {
+    #msg.msg {
       margin: 0;
       min-height: 20px;
       font-size: 14px;
       color: #ffb3b3;
     }
 
-    /* Lista */
-    .list {
-      flex: 1;
+    /* LISTA */
+    #list.list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
-    /* Caso o teu JS injete itens como divs/botoes/texto, já fica “card-like” */
-    .list > * {
-      background: rgba(255, 255, 255, 0.08);
+    /* CARD */
+    .card {
+      background-color: #3f3f3f;
       border-radius: 14px;
-      padding: 12px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
 
-    /* Melhorar inputs/botões caso existam dentro da lista */
-    .list input,
-    .list select,
-    .list textarea {
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      outline: none;
-      margin-top: 8px;
+    /* Nome do produto (1–10) */
+    .card__name {
+      width: 40px;
+      text-align: left;
+      font-size: 32px;
+      font-weight: 700;
     }
 
-    .list button {
+    /* Imagem */
+    .card__imgwrap {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card__img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+    }
+
+    /* Controles */
+    .card__controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card__btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
       border: none;
-      border-radius: 12px;
-      padding: 12px 14px;
+      background: transparent;
+      color: white;
+      font-size: 28px;
+      line-height: 1;
       cursor: pointer;
-      font-weight: 600;
     }
 
-    /* Mobile pequeno: não “rebenta” o ecrã */
-    @media (max-height: 700px) {
-      .app { min-height: 96vh; }
+    .card__btn:active {
+      transform: scale(0.95);
+    }
+
+    .card__qty {
+      min-width: 26px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
     }
   </style>
 </head>
@@ -136,7 +161,26 @@
 
     <main class="container">
       <p id="msg" class="msg"></p>
-      <div id="list" class="list"></div>
+
+      <div id="list" class="list">
+
+        <!-- EXEMPLO DE CARD (o JS vai gerar isto dinamicamente) -->
+        <div class="card">
+          <div class="card__name">1</div>
+
+          <div class="card__imgwrap">
+            <img class="card__img" src="vape.png" alt="Vape">
+          </div>
+
+          <div class="card__controls">
+            <button class="card__btn" type="button">+</button>
+            <div class="card__qty">4</div>
+            <button class="card__btn" type="button">-</button>
+          </div>
+        </div>
+        <!-- FIM EXEMPLO -->
+
+      </div>
     </main>
   </div>
 </body>
