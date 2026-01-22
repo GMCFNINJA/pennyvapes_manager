@@ -1,1 +1,26 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="supabase.js"></script>
+  <script defer src="auth.js"></script>
+</head>
+<body>
+  <main class="card">
+    <h1>Login</h1>
 
+    <label>Nome de utilizador</label>
+    <input id="username" autocomplete="username" />
+
+    <label>Password</label>
+    <input id="password" type="password" autocomplete="current-password" />
+
+    <button id="btnLogin">Entrar</button>
+    <p id="msg" class="msg"></p>
+  </main>
+</body>
+</html>
