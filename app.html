@@ -2,14 +2,25 @@
 <html lang="pt">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Inventário</title>
+
+  <link rel="stylesheet" href="style.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="supabase.js"></script>
   <script defer src="inventory.js"></script>
 </head>
 <body>
-  <h2>Inventário</h2>
-  <button id="btnLogout">Logout</button>
-  <ul id="list"></ul>
+  <header class="topbar">
+    <strong>Inventário</strong>
+    <div class="spacer"></div>
+    <button id="btnLogout" type="button">Logout</button>
+  </header>
+
+  <main class="container">
+    <p id="msg" class="msg"></p>
+    <div id="list" class="list"></div>
+  </main>
 </body>
 </html>
