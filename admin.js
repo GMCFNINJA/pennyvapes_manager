@@ -18,11 +18,11 @@ async function callFn(name, body) {
   const { data, error } = await sb.auth.getSession();
   const token = data?.session?.access_token;
 
-  if (error || !token) {
-    throw new Error("Sem sessão (token). Faz login de novo.");
-  }
+  if (error || !token) throw new Error("Sem sessão/token. Faz login de novo.");
 
-  const res = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+  console.log("TOKEN START:", token.slice(0, 20)); // tem de começar com eyJ...
+
+  const res = await fetch(`${window.SUPABASE_URL}/functions/v1/${name}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -36,6 +36,7 @@ async function callFn(name, body) {
 
   try { return JSON.parse(text); } catch { return text; }
 }
+
 
 });
 
