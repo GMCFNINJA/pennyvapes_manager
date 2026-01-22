@@ -5,22 +5,139 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Inventário</title>
 
-  <link rel="stylesheet" href="style.css" />
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="supabase.js"></script>
   <script defer src="inventory.js"></script>
-</head>
-<body>
-  <header class="topbar">
-    <strong>Inventário</strong>
-    <div class="spacer"></div>
-    <button id="btnLogout" type="button">Logout</button>
-  </header>
 
-  <main class="container">
-    <p id="msg" class="msg"></p>
-    <div id="list" class="list"></div>
-  </main>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: #3a3a3a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+
+    /* “Ecrã” estilo telemóvel */
+    .app {
+      width: 100%;
+      max-width: 380px;
+      min-height: 92vh;
+      padding: 12px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Top bar igual vibe do login */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+    }
+
+    .topbar strong {
+      font-size: 22px;
+      letter-spacing: 0.2px;
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    #btnLogout {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: none;
+      background: white;
+      color: black;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    #btnLogout:active {
+      transform: scale(0.98);
+    }
+
+    /* Conteúdo */
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Mensagens */
+    .msg {
+      margin: 0;
+      min-height: 20px;
+      font-size: 14px;
+      color: #ffb3b3;
+    }
+
+    /* Lista */
+    .list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Caso o teu JS injete itens como divs/botoes/texto, já fica “card-like” */
+    .list > * {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    /* Melhorar inputs/botões caso existam dentro da lista */
+    .list input,
+    .list select,
+    .list textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      margin-top: 8px;
+    }
+
+    .list button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* Mobile pequeno: não “rebenta” o ecrã */
+    @media (max-height: 700px) {
+      .app { min-height: 96vh; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <strong>Inventário</strong>
+      <div class="spacer"></div>
+      <button id="btnLogout" type="button">Logout</button>
+    </header>
+
+    <main class="container">
+      <p id="msg" class="msg"></p>
+      <div id="list" class="list"></div>
+    </main>
+  </div>
 </body>
 </html>
