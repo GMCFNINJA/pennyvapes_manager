@@ -8,3 +8,8 @@ window.sb = window.supabase.createClient(
 );
 
 window.usernameToEmail = (username) => `${username}@penny.local`;
+
+// 👉 ADICIONA ISTO NO FIM
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
