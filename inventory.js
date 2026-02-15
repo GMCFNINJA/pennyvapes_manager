@@ -147,44 +147,68 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 async function enablePush() {
-  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-    alert("Push não suportado neste browser.");
-    return;
+  try {
+    // 0) checks
+    if (!("serviceWorker" in navigator)) {
+      alert("Sem Service Worker (browser não suporta). Usa Chrome no Android.");
+      return;
+    }
+    if (!("PushManager" in window)) {
+      alert("Sem PushManager (browser não suporta push). Usa Chrome no Android.");
+      return;
+    }
+    if (!("Notification" in window)) {
+      alert("Sem Notifications API.");
+      return;
+    }
+
+    // 1) registar SW aqui (mais fiável que depender do supabase.js)
+    const reg = await navigator.serviceWorker.register("./sw.js");
+    await navigator.serviceWorker.ready; // agora sim deve ficar pronto
+
+    // 2) pedir permissão
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") {
+      alert("Permissão recusada ou bloqueada. Vai às definições do site e permite notificações.");
+      return;
+    }
+
+    // 3) subscrever
+    const vapidPublicKey =
+      "BEI8FZOL-mREeQ9EAthEtG7cy9VPinRoQGIAk8hRwjak_FQIFILtyvnuTn6naKZwFMoHSuR1tNihEotLBTQT3R0";
+
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+    });
+
+    // 4) guardar no Supabase via Edge Function
+    const { data } = await sb.auth.getSession();
+    const token = data?.session?.access_token;
+    if (!token) {
+      alert("Sem sessão/token. Faz login primeiro.");
+      return;
+    }
+
+    const res = await fetch(`${window.SUPABASE_URL}/functions/v1/push-register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": window.SUPABASE_ANON_KEY,
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(sub.toJSON()),
+    });
+
+    const text = await res.text();
+    if (!res.ok) {
+      alert("Erro a guardar subscription: " + text);
+      return;
+    }
+
+    alert("Notificações ativadas ✅");
+  } catch (e) {
+    alert("Erro ao ativar push: " + (e?.message ?? e));
+    console.error(e);
   }
-
-  const reg = await navigator.serviceWorker.ready;
-
-  const perm = await Notification.requestPermission();
-  if (perm !== "granted") {
-    alert("Permissão recusada.");
-    return;
-  }
-
-  const vapidPublicKey =
-    "BEI8FZOL-mREeQ9EAthEtG7cy9VPinRoQGIAk8hRwjak_FQIFILtyvnuTn6naKZwFMoHSuR1tNihEotLBTQT3R0";
-
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-  });
-
-  const { data } = await sb.auth.getSession();
-  const token = data?.session?.access_token;
-
-  const res = await fetch(`${window.SUPABASE_URL}/functions/v1/push-register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": window.SUPABASE_ANON_KEY,
-      "Authorization": `Bearer ${token}`,
-    },
-    body: JSON.stringify(sub.toJSON()),
-  });
-
-  if (!res.ok) throw new Error(await res.text());
-  alert("Notificações ativadas ✅");
-}
-
-document.getElementById("btnEnablePush")?.addEventListener("click", () => {
-  enablePush().catch((e) => alert(String(e?.message ?? e)));
 });
