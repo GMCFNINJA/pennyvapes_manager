@@ -61,6 +61,29 @@ async function saveQty(userId, itemNo, qty) {
   if (error) throw error;
 }
 
+/* ===================== PUSH SEND (PASSO 9) ===================== */
+async function sendSalePush() {
+  const { data } = await sb.auth.getSession();
+  const token = data?.session?.access_token;
+  if (!token) return;
+
+  // não precisa body, mas mando um pequeno payload
+  const res = await fetch(`${window.SUPABASE_URL}/functions/v1/push-send-sale`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": window.SUPABASE_ANON_KEY,
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify({ event: "sale" }),
+  });
+
+  // se falhar, não rebenta a app
+  if (!res.ok) {
+    console.warn("push-send-sale falhou:", await res.text());
+  }
+}
+
 $("btnLogout").addEventListener("click", async () => {
   await sb.auth.signOut();
   window.location.href = "index.html";
@@ -88,12 +111,22 @@ $("btnLogout").addEventListener("click", async () => {
 
     const qtyEl = document.getElementById(`qty-${itemNo}`);
     const current = parseInt(qtyEl.textContent, 10);
-    const next = Math.max(0, current + (op === "plus" ? 1 : -1));
+    const delta = op === "plus" ? 1 : -1;
+    const next = Math.max(0, current + delta);
 
+    // se não muda (ex: current=0 e op=minus), não faz nada
+    if (next === current) return;
+
+    // UI otimista
     qtyEl.textContent = String(next);
 
     try {
       await saveQty(user.id, itemNo, next);
+
+      // ✅ PASSO 9: só dispara push quando foi venda (minus) e realmente diminuiu
+      if (op === "minus") {
+        sendSalePush().catch(() => {});
+      }
     } catch (e) {
       console.error(e);
       qtyEl.textContent = String(current);
@@ -103,7 +136,7 @@ $("btnLogout").addEventListener("click", async () => {
   });
 })();
 
-/* ===================== PUSH ===================== */
+/* ===================== PUSH REGISTER (ANDROID) ===================== */
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -127,7 +160,8 @@ async function enablePush() {
     return;
   }
 
-  const vapidPublicKey = "BEI8FZOL-mREeQ9EAthEtG7cy9VPinRoQGIAk8hRwjak_FQIFILtyvnuTn6naKZwFMoHSuR1tNihEotLBTQT3R0";
+  const vapidPublicKey =
+    "BEI8FZOL-mREeQ9EAthEtG7cy9VPinRoQGIAk8hRwjak_FQIFILtyvnuTn6naKZwFMoHSuR1tNihEotLBTQT3R0";
 
   const sub = await reg.pushManager.subscribe({
     userVisibleOnly: true,
