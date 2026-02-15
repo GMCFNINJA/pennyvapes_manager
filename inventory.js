@@ -90,7 +90,6 @@ $("btnLogout").addEventListener("click", async () => {
     const current = parseInt(qtyEl.textContent, 10);
     const next = Math.max(0, current + (op === "plus" ? 1 : -1));
 
-    // UI instantânea
     qtyEl.textContent = String(next);
 
     try {
@@ -103,3 +102,55 @@ $("btnLogout").addEventListener("click", async () => {
     }
   });
 })();
+
+/* ===================== PUSH ===================== */
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+async function enablePush() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    alert("Push não suportado neste browser.");
+    return;
+  }
+
+  const reg = await navigator.serviceWorker.ready;
+
+  const perm = await Notification.requestPermission();
+  if (perm !== "granted") {
+    alert("Permissão recusada.");
+    return;
+  }
+
+  const vapidPublicKey = "BEI8FZOL-mREeQ9EAthEtG7cy9VPinRoQGIAk8hRwjak_FQIFILtyvnuTn6naKZwFMoHSuR1tNihEotLBTQT3R0";
+
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+  });
+
+  const { data } = await sb.auth.getSession();
+  const token = data?.session?.access_token;
+
+  const res = await fetch(`${window.SUPABASE_URL}/functions/v1/push-register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": window.SUPABASE_ANON_KEY,
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(sub.toJSON()),
+  });
+
+  if (!res.ok) throw new Error(await res.text());
+  alert("Notificações ativadas ✅");
+}
+
+document.getElementById("btnEnablePush")?.addEventListener("click", () => {
+  enablePush().catch((e) => alert(String(e?.message ?? e)));
+});
